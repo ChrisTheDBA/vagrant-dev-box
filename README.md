@@ -1,7 +1,7 @@
- # A Virtual Machine for Ohana API Development
+ # A Virtual Machine for Development using Vagrant
 
 ## Introduction
-This project automates the setup of a development environment for working on Ohana API. Use this virtual machine to work on a pull request with everything ready to hack and run the test suites.
+This project automates the setup of a development environment. Use this virtual machine to work on a pull request with everything ready to hack and run the test suites.
 
 ## Requirements
 * [VirtualBox](https://www.virtualbox.org)
@@ -16,8 +16,8 @@ This project automates the setup of a development environment for working on Oha
   In the directory you want to work in, enter the following:
 
   ```
-  $ git clone https://github.com/codeforamerica/ohana-api-dev-box
-  $ cd ohana-api-dev-box
+  $ git clone <URL of this repository>
+  $ cd <Name of repository>
   $ vagrant up
   ```
 
@@ -27,12 +27,10 @@ After the installation has finished (it can take several minutes), you can acces
 
     host $ vagrant ssh
     Welcome to Ubuntu 12.04 LTS (GNU/Linux 3.2.0-23-generic-pae i686)
-    ...
-    vagrant@ohana-api-dev-box:~$
-
+    
 `host $` refers to the command prompt on your computer's OS, as opposed to the prompt in the virtual machine.
 
-If you're on Windows, you can opt to access the virtual machine using an ssh client such as Putty, with the following parameters:
+If you're on Windows, you can opt to access the virtual machine using an ssh client such as Putty or Bitvise SSH, with the following parameters:
 
 ```
 Host: 127.0.0.1
@@ -73,65 +71,6 @@ and
 
 This workflow is convenient because in the host computer you normally have your editor of choice fine-tuned, Git configured, and SSH keys in place.
 
-## Set up the project
-Clone your ohana-api fork into the ohana-api-dev-box directory on the host computer:
-
-    host $ ls
-    README.md   Vagrantfile puppet
-    host $ git clone https://github.com/<your username>/ohana-api.git
-
-Vagrant mounts that directory as _/vagrant_ within the virtual machine:
-
-    host $ vagrant ssh
-    vagrant@ohana-api-dev-box:~$ ls /vagrant
-    LICENSE.md  ohana-api  puppet  README.md  Vagrantfile
-
-### Configure the database
-
-In the `ohana-api` directory, you will find a file within the `config` directory called `database.vagrant.yml`. On the host machine, rename it to `database.yml`, overwriting the `database.yml` file that already exists.
-
-### Set up the environment variables
-
-Inside the `config` folder, you will find a file named `application.example.yml`. Copy its contents to a new file in the same directory called `application.yml`.
-
-### Bootstrap the ohana-api project in the virtual machine:
-
-    host $ vagrant ssh
-    vagrant@ohana-api-dev-box:~$ cd /vagrant/ohana-api
-    vagrant@ohana-api-dev-box:/vagrant/ohana-api$ script/bootstrap
-
-This step can take several minutes, mostly because it takes a while to install all the gems.
-
-On Windows machines, you may run into errors when trying to run `script/boostrap`. If there is a `^M` in the error message, it is due to the character Windows uses for line endings. An easy way to fix this is with [Sublime Text](http://www.sublimetext.com/): open `script/bootstrap`, `script/setup_db`, and `script/restore`, and for each file, select `Line Endings > Unix` from the "View" menu.
-
-Verify that you can launch the app:
-
-    vagrant@ohana-api-dev-box:/vagrant/ohana-api$ rails s -p 8080
-
-You should now be able to access the app on the host machine at
-http://localhost:8080
-
-### Verify the app is returning JSON
-To see all locations, 30 per page:
-
-    http://localhost:8080/api/locations
-
-Search for locations by keyword and/or location:
-
-    http://localhost:8080/api/search?keyword=food
-    http://localhost:8080/api/search?keyword=counseling&location=94403
-    http://localhost:8080/api/search?location=redwood city, ca
-
-Search for locations by languages spoken:
-
-    http://localhost:8080/api/search?language=spanish
-
-### Test the app
-
-Run tests in the virtual machine with this simple command:
-
-    vagrant@ohana-api-dev-box:/vagrant/ohana-api$ script/test
-
 ## Virtual Machine Management
 
 When done just log out with `^D` and suspend the virtual machine
@@ -161,46 +100,3 @@ Finally, to completely wipe the virtual machine from the disk **destroying all i
     host $ vagrant destroy # DANGER: all is gone
 
 Please check the [Vagrant documentation](http://docs.vagrantup.com/v2/) for more information on Vagrant.
-
-## Faster test suites
-
-The default mechanism for sharing folders is convenient and works out the box in
-all Vagrant versions, but there are a couple of alternatives that are more
-performant.
-
-### rsync
-
-Vagrant 1.5 implements a [sharing mechanism based on rsync](https://www.vagrantup.com/blog/feature-preview-vagrant-1-5-rsync.html)
-that dramatically improves read/write because files are actually stored in the
-guest. Just throw
-
-    config.vm.synced_folder '.', '/vagrant', type: 'rsync'
-
-to the _Vagrantfile_ and either rsync manually with
-
-    vagrant rsync
-
-or run
-
-    vagrant rsync-auto
-
-for automatic syncs. See the post linked above for details.
-
-### NFS
-
-If you're using Mac OS X or Linux you can increase the speed of the test suite with Vagrant's NFS synced folders.
-
-With an NFS server installed (already installed on Mac OS X), add the following to the Vagrantfile:
-
-    config.vm.synced_folder '.', '/vagrant', type: 'nfs'
-    config.vm.network 'private_network', ip: '192.168.50.4' # ensure this is available
-
-Then
-
-    host $ vagrant up
-
-Please check the Vagrant documentation on [NFS synced folders](http://docs.vagrantup.com/v2/synced-folders/nfs.html) for more information.
-
-## License
-
-Copyright (c) 2014–<i>ω</i> Code for America. See [LICENSE](https://github.com/codeforamerica/ohana-api-dev-box/blob/master/LICENSE.md) for details.

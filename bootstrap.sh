@@ -35,7 +35,7 @@ sudo apt-get update
 install PostgreSQL postgresql-9.3 postgresql-contrib-9.3 libpq-dev
 cat << EOF | sudo -u postgres psql
 -- Create the database user:
-CREATE USER vagrant WITH PASSWORD 'ohanatest';
+CREATE USER vagrant WITH PASSWORD 'ncconnecttest';
 alter role vagrant superuser;
 EOF
 
